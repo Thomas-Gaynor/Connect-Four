@@ -74,6 +74,7 @@
 		</table>
 
 		<button onclick="resetBoard()">Reset Game</button>
+		<button id="AIButton" onclick="enableAI()">Enable AI</button>
 
 		<table  class='scoreTable'>
 
@@ -91,6 +92,8 @@
 			</tbody>
 
 		</table>
+
+		<p><b>NB:</b> The AI is completely braindead and thus far only follows a very basic pattern of how to do things. Also I don't understand 2d Arrays; send help</p>
 		
 	</body>
 	<script>
@@ -102,8 +105,11 @@
 		var gameBoardHeight = 6
 		var gameBoardWidth = 7
 
+		var cellsInLine = 0;
+
 		var redScore = 0
 		var blueScore = 0
+		var AIEnabled = false
 
 		var tableBuilderVar = document.getElementById("tableBuilder")
 
@@ -114,13 +120,13 @@
 			// event.target.classList.remove("clearCell")
 			if (playersTurn == true){
 
-				checkBoardForClear(eventTargetId[0], true, "red")
+				checkBoardForClear(eventTargetId[0])
 
 
-			}else{
+			}else if(playersTurn == false && AIEnabled == false){
 
 				// Temp Til AI Works
-				checkBoardForClear(eventTargetId[0], false, "blue")
+				checkBoardForClear(eventTargetId[0])
 
 			}
 			
@@ -153,7 +159,35 @@
 
 		}
 
+		function basicAI(){
+			var tempNum = getRandomArbitrary(0,gameBoardWidth - 1)
+			checkBoardForClear(tempNum)
+		}
+
+		function getRandomArbitrary(min, max) {
+		    return Math.round(Math.random() * (max - min) + min);
+		}
+
+
+		function enableAI(){
+
+			playersTurn = true
+
+			resetBoard()
+
+			if (AIEnabled == false){
+				AIEnabled = true
+				document.getElementById("AIButton").innerHTML = "Disable AI"
+			}else{
+				AIEnabled = false
+				document.getElementById("AIButton").innerHTML = "Enable AI"
+			}
+
+		}
+
 		function callVictory(winner){
+
+			cellsInLine = 0
 
 			setTimeout(function(){
 
@@ -167,6 +201,9 @@
 
 					document.getElementById("blueScore").innerHTML = blueScore
 
+					resetBoard()
+					basicAI()
+
 				}else if(winner == "red"){
 
 					playersTurn = false
@@ -175,9 +212,16 @@
 
 					document.getElementById("redScore").innerHTML = redScore
 
+					resetBoard()
+					if (AIEnabled == true){
+						basicAI()
+					}
+
 				}
 
-				resetBoard()
+				
+
+
 
 			}, 10)
 
@@ -196,6 +240,9 @@
 					tempCell.classList.add("red")
 					checkForWin(i, columnIdNumber)
 					playersTurn = false
+					if (AIEnabled == true){
+						basicAI()
+					}
 					
 					return
 
@@ -210,7 +257,13 @@
 					return
 
 				}
-			} 
+			}
+
+			if(playersTurn == false){
+				basicAI()
+			}
+
+
 		}
 
 		function initGameBoard(){
@@ -365,8 +418,7 @@
 				cellsInLine = 0
 			}
 		}
-		
-
+			
 
 		initGameBoard()
 
