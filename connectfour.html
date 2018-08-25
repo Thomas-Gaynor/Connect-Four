@@ -1,0 +1,375 @@
+<html>
+	<head>
+		<title>Connect 4</title>
+
+		<style>
+
+			*{
+				text-align: center;
+				font-family: Helvetica, Arial, Sans-Serif;
+			}
+
+			.innerCell {
+				width: 80px;
+				height: 80px;
+				border-right: 1px solid lightgrey;
+				border-left: 1px solid lightgrey;
+				border-top: 1px solid white;
+				border-bottom: 1px solid white;
+				text-align: center;
+				padding: 0px;
+				margin:  0px;
+				border-radius: 0px;
+			}
+
+
+
+			table{
+				margin: auto;
+				margin-top: 40px;
+				border-spacing: 0px;
+				border: 1px solid lightgrey;
+
+			}
+
+			.red{
+				background-color: red;
+			}
+
+			.blue{
+				background-color: blue;
+			}
+
+			.clearCell{
+				background-color: white;
+			}
+
+			.scoreTable{
+				width: 50%;
+			}
+
+			.scoreCell{
+				width: 50%;
+				height: 20px;
+				border: 1px solid lightgrey;
+			}
+
+			h1{
+				margin-top: 40px;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<h1>Connect 4</h1>
+
+		<table>
+
+			<tbody id="tableBuilder">
+				
+
+			</tbody>
+
+		</table>
+
+		<button onclick="resetBoard()">Reset Game</button>
+
+		<table  class='scoreTable'>
+
+			<tbody>
+				
+				<tr>
+					<td class='scoreCell'>Red Score:</td>
+					<td class='scoreCell'>Blue Score</td>
+				</tr>
+				<tr>
+					<td class='scoreCell' id="redScore">0</td>
+					<td class='scoreCell' id="blueScore">0</td>
+				</tr>
+
+			</tbody>
+
+		</table>
+		
+	</body>
+	<script>
+
+		var arrayOfBoard = [[],[],[],[],[],[]]
+
+		var playersTurn = true
+
+		var gameBoardHeight = 6
+		var gameBoardWidth = 7
+
+		var redScore = 0
+		var blueScore = 0
+
+		var tableBuilderVar = document.getElementById("tableBuilder")
+
+		document.getElementById("tableBuilder").addEventListener("click", function(){
+
+			var eventTargetId = event.target.id.split("-")
+			// event.target.classList.add("blue")
+			// event.target.classList.remove("clearCell")
+			if (playersTurn == true){
+
+				checkBoardForClear(eventTargetId[0], true, "red")
+
+
+			}else{
+
+				// Temp Til AI Works
+				checkBoardForClear(eventTargetId[0], false, "blue")
+
+			}
+			
+
+		})
+
+		function resetBoard(){
+
+			for (var i = 0; i < gameBoardHeight; i++) {
+
+				for (var j = 0; j < gameBoardWidth; j++) {
+
+					var tempResetCell = document.getElementById(j + "-" + i)
+
+					if (tempResetCell.classList.contains("red")){
+
+						tempResetCell.classList.remove("red")
+						tempResetCell.classList.add("clearCell")
+
+					}else if(tempResetCell.classList.contains("blue")){
+
+						tempResetCell.classList.remove("blue")
+						tempResetCell.classList.add("clearCell")
+
+					}
+	
+				}		
+
+			}		
+
+		}
+
+		function callVictory(winner){
+
+			setTimeout(function(){
+
+				alert(winner + " has won")
+
+				if(winner == "blue"){
+
+					blueScore += 1
+
+					playersTurn = true
+
+					document.getElementById("blueScore").innerHTML = blueScore
+
+				}else if(winner == "red"){
+
+					playersTurn = false
+
+					redScore += 1
+
+					document.getElementById("redScore").innerHTML = redScore
+
+				}
+
+				resetBoard()
+
+			}, 10)
+
+			
+
+		}
+
+		function checkBoardForClear(columnIdNumber){
+
+			for (var i = gameBoardHeight - 1; i >= 0; i--){
+				
+				if (playersTurn == true && document.getElementById(columnIdNumber + "-" + i).classList.contains('clearCell') == true){
+
+					var tempCell = document.getElementById(columnIdNumber + "-" + i)
+					tempCell.classList.remove("clearCell")
+					tempCell.classList.add("red")
+					checkForWin(i, columnIdNumber)
+					playersTurn = false
+					
+					return
+
+				}else if (document.getElementById(columnIdNumber + "-" + i).classList.contains('clearCell') == true){
+
+					var tempCell = document.getElementById(columnIdNumber + "-" + i)
+					tempCell.classList.remove("clearCell")
+					tempCell.classList.add("blue")
+					checkForWin(i, columnIdNumber)
+					playersTurn = true
+					
+					return
+
+				}
+			} 
+		}
+
+		function initGameBoard(){
+
+			// Runs through the creation of the board
+
+			for (var i = 0; i < gameBoardHeight; i++) {
+
+				tableBuilderVar.innerHTML += "<tr id='row" + i + "'>"
+				var tempRow = document.getElementById("row" + i)
+
+				for (var j = 0; j < gameBoardWidth; j++) {
+
+					tempRow.innerHTML += "<td class='clearCell innerCell' id='" + j + "-" + i + "'></td>"
+	
+				}		
+			}		
+		}
+
+		function checkForWin(i,columnIdNumber){
+			var tempX = columnIdNumber
+			var tempY = i
+			var cellsInLine;
+			var colour;
+
+			for (var j = 0; j <= 1; j++){
+
+				if (j == 0){
+
+					colour = "red"
+
+				}else{
+
+					colour = "blue"
+
+				}
+
+				console.log(colour)
+
+				for (var i = 0; i < gameBoardHeight; i++){
+
+					var tempCheckCell = document.getElementById(tempX + "-" + i)
+					
+					if (tempCheckCell.classList.contains(colour)){
+
+						cellsInLine += 1
+
+						if (cellsInLine == 4){
+
+							console.log("VICTORY" + colour)
+							callVictory(colour)
+
+						}
+
+					}else{
+
+						cellsInLine = 0
+
+					}
+					
+				}
+
+				cellsInLine = 0
+
+
+				for (var i = 0; i < gameBoardWidth; i++){
+
+					var tempCheckCell = document.getElementById(i + "-" + tempY)
+					
+					if (tempCheckCell.classList.contains(colour)){
+
+						cellsInLine += 1
+
+						if (cellsInLine == 4){
+
+							console.log("VICTORY" + colour)
+							callVictory(colour)
+
+						}
+
+					}else{
+
+						cellsInLine = 0
+
+					}
+					
+				}
+
+				cellsInLine = 0
+
+				for (var i = (gameBoardWidth * -1); i < gameBoardWidth; i++){
+
+					var tempCheckCell;
+
+					if (document.getElementById((parseInt(tempX) + i) + "-" + (parseInt(tempY) + i)) != null){
+
+						tempCheckCell = document.getElementById((parseInt(tempX) + i) + "-" + (parseInt(tempY) + i))
+
+						if (tempCheckCell.classList.contains(colour)){
+
+							cellsInLine += 1
+
+							if (cellsInLine == 4){
+
+								console.log("VICTORY" + colour)
+								callVictory(colour)
+
+							}
+
+						}else{
+
+							cellsInLine = 0
+
+						}
+					
+					}
+
+				}
+
+				cellsInLine = 0
+
+				for (var i = (gameBoardWidth * -1); i < gameBoardWidth; i++){
+
+					var tempCheckCell;
+
+					if (document.getElementById((parseInt(tempX) + i) + "-" + (parseInt(tempY) - i)) != null){
+
+						tempCheckCell = document.getElementById((parseInt(tempX) + i) + "-" + (parseInt(tempY) - i))
+
+						if (tempCheckCell.classList.contains(colour)){
+
+							cellsInLine += 1
+
+							if (cellsInLine == 4){
+
+								console.log("VICTORY" + colour)
+								callVictory(colour)
+								
+
+							}
+
+						}else{
+
+								cellsInLine = 0
+
+						}
+					
+					}
+
+				}
+
+				cellsInLine = 0
+			}
+		}
+		
+
+
+		initGameBoard()
+
+	</script>
+</html>
+
